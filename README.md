@@ -10,7 +10,7 @@
 |---|---|
 | **Course** | Advanced Algorithm Design |
 | **Instructor** | Dr. Suvadip Hazra |
-| **Team** | Sugyan Singh (24BCS148) · Ritik Sinha (24BCS121) |
+| **Team Members** | Sugyan Singh (24BCS148) · Ritik Sinha (24BCS121) |
 | **Implementations** | C++17 · Java · JavaScript (browser visualizer) |
 
 </div>
