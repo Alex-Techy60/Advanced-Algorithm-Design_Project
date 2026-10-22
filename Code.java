@@ -18,33 +18,43 @@ public class Code {
     static boolean[][][] stenchCells;
     static boolean[][] breezeCells;
 
-    static final int[] dx = {-1, 1, 0, 0};
-    static final int[] dy = {0, 0, -1, 1};
+    static final int[] dx = { -1, 1, 0, 0 };
+    static final int[] dy = { 0, 0, -1, 1 };
 
-    static void parse() throws IOException {
-        String input = new String(System.in.readAllBytes());
-        int pos = 0;
-        int len = input.length();
+    static void parse() {
+        java.util.Scanner sc = new java.util.Scanner(System.in);
 
-        while (pos < len && Character.isWhitespace(input.charAt(pos))) pos++;
-        int start = pos;
-        while (pos < len && !Character.isWhitespace(input.charAt(pos))) pos++;
-        n = Integer.parseInt(input.substring(start, pos));
-
+        n = sc.nextInt();
         maxTurns = 4 * n * n;
         grid = new char[n + 2][n + 2];
 
-        for (int row = 1; row <= n; row++) {
-            for (int col = 1; col <= n; col++) {
-                while (pos < len && Character.isWhitespace(input.charAt(pos))) pos++;
-                grid[row][col] = input.charAt(pos++);
+        int row = 1;
+        int col = 1;
 
-                if (grid[row][col] == 'W') wumpuses.add(new int[]{row, col});
-                if (grid[row][col] == 'P') pits.add(new int[]{row, col});
-                if (grid[row][col] == 'T') timezones.add(new int[]{row, col});
-                if (grid[row][col] == 'G') goldPos = new int[]{row, col};
+        while (row <= n && sc.hasNext()) {
+            String token = sc.next();
+
+            for (int i = 0; i < token.length() && row <= n; i++) {
+                grid[row][col] = token.charAt(i);
+
+                if (grid[row][col] == 'W')
+                    wumpuses.add(new int[] { row, col });
+                if (grid[row][col] == 'P')
+                    pits.add(new int[] { row, col });
+                if (grid[row][col] == 'T')
+                    timezones.add(new int[] { row, col });
+                if (grid[row][col] == 'G')
+                    goldPos = new int[] { row, col };
+
+                col++;
+                if (col > n) {
+                    col = 1;
+                    row++;
+                }
             }
         }
+
+        sc.close();
     }
 
     static void precompute() {
@@ -60,15 +70,21 @@ public class Code {
                 boolean phaseA = (t % 2 == 0);
 
                 int[] steps = null;
-                if (row % 2 == 0 && phaseA) steps = new int[]{1, 1, 1, -1};
-                if (row % 2 == 0 && !phaseA) steps = new int[]{1, -1, -1, -1};
-                if (row % 2 != 0 && phaseA) steps = new int[]{-1, -1, -1, 1};
-                if (row % 2 != 0 && !phaseA) steps = new int[]{-1, 1, 1, 1};
+                if (row % 2 == 0 && phaseA)
+                    steps = new int[] { 1, 1, 1, -1 };
+                if (row % 2 == 0 && !phaseA)
+                    steps = new int[] { 1, -1, -1, -1 };
+                if (row % 2 != 0 && phaseA)
+                    steps = new int[] { -1, -1, -1, 1 };
+                if (row % 2 != 0 && !phaseA)
+                    steps = new int[] { -1, 1, 1, 1 };
 
                 for (int i = 0; i < steps.length; i++) {
                     col = col + steps[i];
-                    if (col < 1) col = 1;
-                    if (col > n) col = n;
+                    if (col < 1)
+                        col = 1;
+                    if (col > n)
+                        col = n;
                 }
 
                 wumpusCols[w][t + 1] = col;
@@ -86,8 +102,10 @@ public class Code {
                     int sr = wr + dx[d];
                     int sc = wc + dy[d];
 
-                    if (sr < 1 || sr > n) continue;
-                    if (sc < 1 || sc > n) continue;
+                    if (sr < 1 || sr > n)
+                        continue;
+                    if (sc < 1 || sc > n)
+                        continue;
 
                     stenchCells[t][sr][sc] = true;
                 }
@@ -104,8 +122,10 @@ public class Code {
                 int br = pr + dx[d];
                 int bc = pc + dy[d];
 
-                if (br < 1 || br > n) continue;
-                if (bc < 1 || bc > n) continue;
+                if (br < 1 || br > n)
+                    continue;
+                if (bc < 1 || bc > n)
+                    continue;
 
                 breezeCells[br][bc] = true;
             }
@@ -123,7 +143,8 @@ public class Code {
 
     static int compareStates(int[] a, int[] b) {
         for (int i = 0; i < a.length; i++) {
-            if (a[i] != b[i]) return Integer.compare(a[i], b[i]);
+            if (a[i] != b[i])
+                return Integer.compare(a[i], b[i]);
         }
         return 0;
     }
@@ -137,16 +158,17 @@ public class Code {
         Map<Long, List<int[]>> bestPath = new HashMap<>();
 
         List<int[]> startPath = new ArrayList<>();
-        startPath.add(new int[]{1, 1});
+        startPath.add(new int[] { 1, 1 });
 
         int startStench = 0;
-        if (stenchCells[0][1][1]) startStench = 1;
+        if (stenchCells[0][1][1])
+            startStench = 1;
 
         long startKey = makeKey(1, 1, 0, startStench, 0);
         bestCost.put(startKey, 0);
         bestPath.put(startKey, startPath);
 
-        pq.add(new int[]{0, 0, 1, 1, 0, startStench, 0});
+        pq.add(new int[] { 0, 0, 1, 1, 0, startStench, 0 });
 
         while (!pq.isEmpty()) {
             int[] curr = pq.poll();
@@ -178,8 +200,10 @@ public class Code {
                 int nc = col + dy[d];
                 int nt = turn + 1;
 
-                if (nr < 1 || nr > n) continue;
-                if (nc < 1 || nc > n) continue;
+                if (nr < 1 || nr > n)
+                    continue;
+                if (nc < 1 || nc > n)
+                    continue;
                 boolean isGold = (nr == goldPos[0] && nc == goldPos[1]);
 
                 boolean visited = false;
@@ -189,13 +213,17 @@ public class Code {
                         break;
                     }
                 }
-                if (visited) continue;
+                if (visited)
+                    continue;
 
                 int delta = 1;
                 if (!isGold) {
-                    if (grid[nr][nc] == 'P') delta += 5;
-                    if (breezeCells[nr][nc]) delta += 2;
-                    if (grid[nr][nc] == 'T') delta -= 3;
+                    if (grid[nr][nc] == 'P')
+                        delta += 5;
+                    if (breezeCells[nr][nc])
+                        delta += 2;
+                    if (grid[nr][nc] == 'T')
+                        delta -= 3;
                 }
 
                 int arrivalWt = wumpusTurn + 1;
@@ -210,13 +238,16 @@ public class Code {
                             break;
                         }
                     }
-                    if (wumpusHere) continue;
+                    if (wumpusHere)
+                        continue;
                 }
 
                 int newStench = stench;
                 if (!isGold) {
-                    if (stenchCells[arrivalWt][nr][nc]) newStench++;
-                    if (newStench >= 3) continue;
+                    if (stenchCells[arrivalWt][nr][nc])
+                        newStench++;
+                    if (newStench >= 3)
+                        continue;
                 }
 
                 int newWt = wumpusTurn + delta;
@@ -226,7 +257,7 @@ public class Code {
                 int newCost = Math.max(0, cost + delta);
 
                 List<int[]> newPath = new ArrayList<>(path);
-                newPath.add(new int[]{nr, nc});
+                newPath.add(new int[] { nr, nc });
 
                 long newKey = makeKey(nr, nc, nt, newStench, newWt);
 
@@ -236,7 +267,7 @@ public class Code {
 
                     int newPriority = newCost;
 
-                    pq.add(new int[]{newPriority, newCost, nr, nc, nt, newStench, newWt});
+                    pq.add(new int[] { newPriority, newCost, nr, nc, nt, newStench, newWt });
                 }
             }
         }
@@ -249,8 +280,9 @@ public class Code {
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < bestAnswerPath.size(); i++) {
                 sb.append("(").append(bestAnswerPath.get(i)[0]).append(",")
-                  .append(bestAnswerPath.get(i)[1]).append(")");
-                if (i < bestAnswerPath.size() - 1) sb.append(" ");
+                        .append(bestAnswerPath.get(i)[1]).append(")");
+                if (i < bestAnswerPath.size() - 1)
+                    sb.append(" ");
             }
             System.out.println(sb);
         }
