@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wumpus — Cave Navigator</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="logo">
+      <div class="logo-title">WUMPUS<span>.</span></div>
+      <div class="logo-sub">Advanced Algorithm Design</div>
+    </div>
+    <div class="status-pill" id="status-pill">WAITING</div>
+  </header>
+
+  <div class="main">
+
+    <div class="left-panel">
+
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Grid Input</span>
+          <span class="mono-small" id="grid-size-label">—</span>
+        </div>
+        <div class="panel-body">
+          <textarea id="grid-input" placeholder="5&#10;. . . P .&#10;W . . . .&#10;. P . . G&#10;. . W . .&#10;. . . T ."></textarea>
+          <div class="error-msg" id="error-msg"></div>
+          <div class="btn-row">
+            <button class="btn-primary" onclick="runAlgo()">&#9654; RUN ALGORITHM</button>
+            <button class="btn-secondary" onclick="loadExample()">EXAMPLE</button>
+            <button class="btn-secondary" onclick="clearAll()">&#10005;</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Legend</span></div>
+        <div class="panel-body">
+          <div class="legend">
+            <div class="legend-item">
+              <div class="legend-dot" style="background:rgba(200,255,0,0.2);border:1px solid var(--accent)">
+                <span style="font-size:9px;color:var(--accent)">&#9650;</span>
+              </div>
+              <span>Agent</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:rgba(255,215,0,0.15);border:1px solid var(--gold)">
+                <span style="font-size:9px;color:var(--gold)">&#9733;</span>
+              </div>
+              <span>Gold</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:rgba(255,59,59,0.12);border:1px solid rgba(255,59,59,0.4)">
+                <span style="font-size:9px;color:var(--wumpus)">W</span>
+              </div>
+              <span>Wumpus</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:rgba(255,140,0,0.12);border:1px solid rgba(255,140,0,0.4)">
+                <span style="font-size:9px;color:var(--pit)">P</span>
+              </div>
+              <span>Pit (+5s)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:rgba(123,97,255,0.12);border:1px solid rgba(123,97,255,0.4)">
+                <span style="font-size:9px;color:var(--tz)">T</span>
+              </div>
+              <span>Timezone (-3s)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.3)">
+                <span style="font-size:9px;color:var(--accent3)">&#8594;</span>
+              </div>
+              <span>Path</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot stench-legend"></div>
+              <span>Stench zone</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot breeze-legend"></div>
+              <span>Breeze zone</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="stats-panel" style="display:none">
+        <div class="panel-header"><span class="panel-title">Result</span></div>
+        <div class="panel-body">
+          <div class="stats-grid">
+            <div class="stat-box">
+              <div class="stat-label">Status</div>
+              <div class="stat-value" id="stat-status" style="font-size:16px">—</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Time Cost</div>
+              <div class="stat-value accent" id="stat-cost">—</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Path Length</div>
+              <div class="stat-value" id="stat-length">—</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Turn</div>
+              <div class="stat-value accent" id="stat-turn">—</div>
+            </div>
+          </div>
+          <div style="margin-top:12px">
+            <div class="panel-title" style="margin-bottom:8px">Path</div>
+            <div class="path-display" id="path-display">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="anim-panel" style="display:none">
+        <div class="panel-header">
+          <span class="panel-title">Animation</span>
+          <button class="play-btn" id="play-btn" onclick="togglePlay()">&#9654; PLAY</button>
+        </div>
+        <div class="panel-body">
+          <div class="turn-control">
+            <div class="turn-row">
+              <span class="turn-label">Step</span>
+              <span class="turn-value" id="turn-display">0 / 0</span>
+            </div>
+            <input type="range" id="turn-slider" min="0" value="0" oninput="onSlider(this.value)">
+            <div class="turn-row">
+              <span class="turn-label">Speed</span>
+              <input type="range" id="speed-slider" min="100" max="1000" value="500" step="100" style="width:120px">
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="right-panel">
+      <div class="grid-wrapper">
+        <div class="grid-top-bar">
+          <div class="panel-title">Cave Grid</div>
+          <div class="mono-small" id="wt-display"></div>
+        </div>
+        <div class="grid-container">
+          <div id="grid-placeholder" class="grid-placeholder">
+            <div class="grid-placeholder-icon">&#11036;</div>
+            <div class="grid-placeholder-text">Enter grid data and run the algorithm</div>
+          </div>
+          <div id="cave-grid" style="display:none"></div>
+        </div>
+        <div class="grid-info" id="grid-info" style="display:none">
+          <div class="info-item">
+            <div class="info-dot" style="background:rgba(255,59,59,0.6)"></div>
+            <span id="info-wumpus">0 Wumpuses</span>
+          </div>
+          <div class="info-item">
+            <div class="info-dot" style="background:rgba(255,140,0,0.6)"></div>
+            <span id="info-pits">0 Pits</span>
+          </div>
+          <div class="info-item">
+            <div class="info-dot" style="background:rgba(123,97,255,0.6)"></div>
+            <span id="info-tz">0 Timezones</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="algo.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>
