@@ -27,7 +27,7 @@ int dx[] = {-1, 1, 0, 0};
 int dy[] = {0, 0, -1, 1};
 
 
-void parse() {
+void Parse() {
 
     cin >> n;
 
@@ -53,7 +53,7 @@ void parse() {
     }
 }
 
-void precompute() {
+void preCompute() {
 
     int W = wumpuses.size();
 
@@ -122,7 +122,7 @@ void precompute() {
 
 
 
-void search() {
+void Search() {
 
     typedef tuple<int,int,int,int,int,int,int> PQState;
 
@@ -271,8 +271,8 @@ void search() {
 
 
 int main() {
-    parse();       
-    precompute();  
-    search();      
+    Parse();       
+    preCompute();  
+    Search();      
     return 0;
 }
